@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String    @id @default(uuid())
+  name                   String
+  mail                   String    @unique
+  password_hash          String
+  is_assistant           Boolean?
+  is_coordinator_project Boolean?
+  is_admin               Boolean?
+  create_at              DateTime  @default(now())
+  disabled_at            DateTime?
+
+  @@map("users")
+}
+
+model Project {
+  id                     String       @id @default(uuid())
+  name                   String       @unique
+  start_of_execution     DateTime
+  end_of_execution       DateTime
+  total_revenue_forecast Decimal
+  checking_account       String
+  create_at              DateTime     @default(now())
+  updated_at             DateTime?
+  disabled_at            DateTime?
+  RubricItem             RubricItem[]
+
+  @@map("projects")
+}
+
+model Rubric {
+  id              String       @id @default(uuid())
+  name            String       @unique
+  is_rh           Boolean?
+  is_contribution Boolean?
+  is_spf          Boolean?
+  create_at       DateTime     @default(now())
+  updated_at      DateTime?
+  disabled_at     DateTime?
+  rubricItens     RubricItem[]
+
+  @@map("rubrics")
+}
+
+model RubricItem {
+  id          String    @id @default(uuid())
+  description String
+  amount      Int
+  value       Decimal
+  observation String
+  create_at   DateTime  @default(now())
+  updated_at  DateTime?
+  disabled_at DateTime?
+  rublic      Rubric    @relation(fields: [rubric_id], references: [id])
+  rubric_id   String
+  project     Project   @relation(fields: [project_id], references: [id])
+  project_id  String
+
+  @@map("rubric_item")
+}
