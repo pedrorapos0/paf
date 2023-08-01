@@ -25,16 +25,16 @@ model User {
 }
 
 model Project {
-  id                     String       @id @default(uuid())
-  name                   String       @unique
-  start_of_execution     DateTime
-  end_of_execution       DateTime
-  total_revenue_forecast Decimal
-  checking_account       String
-  create_at              DateTime     @default(now())
-  updated_at             DateTime?
-  disabled_at            DateTime?
-  RubricItem             RubricItem[]
+  id                  String                @id @default(uuid())
+  name                String                @unique
+  start_of_execution  DateTime
+  end_of_execution    DateTime
+  checking_account    String
+  create_at           DateTime              @default(now())
+  updated_at          DateTime?
+  disabled_at         DateTime?
+  RubricItem          RubricItem[]
+  ProjectOnFinanciers ProjectOnFinanciers[]
 
   @@map("projects")
 }
@@ -68,4 +68,26 @@ model RubricItem {
   project_id  String
 
   @@map("rubric_item")
+}
+
+model Financier {
+  id                  String                @id @default(uuid())
+  name                String
+  source_of_resource  String
+  predicted_value     Decimal
+  create_at           DateTime              @default(now())
+  updated_at          DateTime?
+  disabled_at         DateTime?
+  ProjectOnFinanciers ProjectOnFinanciers[]
+
+  @@map("financiers")
+}
+
+model ProjectOnFinanciers {
+  project      Project   @relation(fields: [project_id], references: [id])
+  project_id   String
+  financier    Financier @relation(fields: [financier_id], references: [id])
+  financier_id String
+
+  @@id([project_id, financier_id])
 }
